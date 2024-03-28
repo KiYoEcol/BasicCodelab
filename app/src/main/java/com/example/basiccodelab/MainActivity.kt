@@ -3,17 +3,22 @@ package com.example.basiccodelab
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -32,25 +37,78 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun MyApp(
+    modifier: Modifier = Modifier
+) {
+    var shouldShowOnBoarding by remember { mutableStateOf(true) }
+    Surface(modifier = modifier) {
+        if (shouldShowOnBoarding) {
+            OnBoardingScreen({ shouldShowOnBoarding = false })
+        } else {
+            Greetings()
+        }
+    }
+}
+
+@Preview
+@Composable
+fun MyAppPreview() {
+    BasicCodelabTheme {
+        MyApp(Modifier.fillMaxSize())
+    }
+}
+
+@Composable
+fun OnBoardingScreen(
+    onContinueClicked: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(text = "Welcome to the Basic Codelab!")
+        Button(
+            modifier = Modifier.padding(24.dp),
+            onClick = onContinueClicked
+        ) {
+            Text(text = "Continue")
+        }
+    }
+}
+
+@Preview(showBackground = true, widthDp = 320, heightDp = 320)
+@Composable
+fun OnBoardingPreview() {
+    BasicCodelabTheme {
+        OnBoardingScreen(onContinueClicked = {})
+    }
+}
+
+@Composable
+fun Greetings(
     modifier: Modifier = Modifier,
     names: List<String> = listOf("World", "Compose")
 ) {
-    Surface(
-        modifier = modifier,
-        color = MaterialTheme.colorScheme.background
-    ) {
-        Column {
-            for (name in names) {
-                Greeting(name = name)
-            }
+    Column(modifier = modifier.padding(vertical = 4.dp)) {
+        for (name in names) {
+            Greeting(name = name)
         }
+    }
+}
+
+@Preview(showBackground = true, widthDp = 320)
+@Composable
+fun GreetingsPreview() {
+    BasicCodelabTheme {
+        Greetings()
     }
 }
 
 @Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {
-    val expanded = remember { mutableStateOf(false) }
-    val extraPadding = if (expanded.value) 48.dp else 0.dp
+    var expanded by remember { mutableStateOf(false) }
+    val extraPadding = if (expanded) 48.dp else 0.dp
     Surface(
         color = MaterialTheme.colorScheme.primary,
         modifier = modifier.padding(vertical = 4.dp, horizontal = 8.dp)
@@ -61,11 +119,11 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
                     .weight(1f)
                     .padding(bottom = extraPadding)
             ) {
-                Text(text = "Hello ")
+                Text(text = "Hello, ")
                 Text(text = name)
             }
-            ElevatedButton(onClick = { expanded.value = !expanded.value }) {
-                Text(text = if (expanded.value) "show less" else "show more")
+            ElevatedButton(onClick = { expanded = !expanded }) {
+                Text(text = if (expanded) "show less" else "show more")
             }
         }
 
@@ -76,6 +134,6 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 @Composable
 fun GreetingPreview() {
     BasicCodelabTheme {
-        MyApp()
+        Greeting(name = "Test")
     }
 }
